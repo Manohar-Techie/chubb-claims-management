@@ -1,4 +1,4 @@
-Chubb Claims Management API
+Claims Management
 
 A RESTful backend application for managing motor and property insurance claims. The application supports the claim lifecycle, from submission and assignment through assessment, decision-making, settlement, and audit history.
 
