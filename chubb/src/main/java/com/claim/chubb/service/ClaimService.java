@@ -15,9 +15,11 @@ import java.util.List;
 public class ClaimService {
 
     private final ClaimRepository claimRepository;
+    private final AuditService auditService;
 
-    public ClaimService(ClaimRepository claimRepository) {
+    public ClaimService(ClaimRepository claimRepository, AuditService auditService) {
         this.claimRepository = claimRepository;
+        this.auditService = auditService;
     }
 
     @Transactional
@@ -36,6 +38,14 @@ public class ClaimService {
 
         // Status defaults to SUBMITTED.
         Claim savedClaim = claimRepository.save(claim);
+        auditService.recordEvent(
+                savedClaim.getClaimReference(),
+                "CLAIM_SUBMITTED",
+                savedClaim.getClaimantIdentifier(),
+                null,
+                savedClaim.getStatus(),
+                "Claim submitted: type=" + savedClaim.getClaimType()
+                        + ", policyReference=" + savedClaim.getPolicyReference());
 
         return toResponse(savedClaim);
     }

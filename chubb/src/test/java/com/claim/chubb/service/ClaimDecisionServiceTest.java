@@ -44,6 +44,9 @@ class ClaimDecisionServiceTest {
     @Mock
     private ClaimDecisionRepository decisionRepository;
 
+    @Mock
+    private AuditService auditService;
+
     @InjectMocks
     private ClaimDecisionService decisionService;
 
@@ -83,6 +86,9 @@ class ClaimDecisionServiceTest {
         assertNotNull(response.decidedAt());
         assertEquals(ClaimStatus.APPROVED, claim.getStatus());
         verify(claimRepository).save(claim);
+        verify(auditService).recordEvent(
+                eq(claimReference), eq("CLAIM_APPROVED"), eq("officer-1"),
+                eq(ClaimStatus.ASSESSED), eq(ClaimStatus.APPROVED), contains("Approved"));
     }
 
     @Test
@@ -98,6 +104,10 @@ class ClaimDecisionServiceTest {
         assertEquals("Insufficient evidence", response.decisionReason());
         assertEquals(ClaimStatus.REJECTED, claim.getStatus());
         verify(decisionRepository).save(any(ClaimDecision.class));
+        verify(auditService).recordEvent(
+                eq(claimReference), eq("CLAIM_REJECTED"), eq("officer-1"),
+                eq(ClaimStatus.ASSESSED), eq(ClaimStatus.REJECTED),
+                contains("Insufficient evidence"));
     }
 
     @Test

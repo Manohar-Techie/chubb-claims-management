@@ -20,11 +20,14 @@ public class InformationService {
 
     private final ClaimRepository claimRepository;
     private final ClaimInformationRequestRepository informationRequestRepository;
+    private final AuditService auditService;
 
     public InformationService(ClaimRepository claimRepository,
-                              ClaimInformationRequestRepository informationRequestRepository) {
+                              ClaimInformationRequestRepository informationRequestRepository,
+                              AuditService auditService) {
         this.claimRepository = claimRepository;
         this.informationRequestRepository = informationRequestRepository;
+        this.auditService = auditService;
     }
 
     @Transactional
@@ -44,6 +47,14 @@ public class InformationService {
 
         claim.setStatus(ClaimStatus.INFORMATION_REQUIRED);
         claimRepository.save(claim);
+        auditService.recordEvent(
+                claimReference,
+                "INFORMATION_REQUESTED",
+                "SYSTEM",
+                ClaimStatus.UNDER_REVIEW,
+                ClaimStatus.INFORMATION_REQUIRED,
+                "Information request " + savedRequest.getId() + ": "
+                        + savedRequest.getDescription());
 
         return toResponse(savedRequest);
     }
@@ -92,6 +103,13 @@ public class InformationService {
             claim.setStatus(ClaimStatus.UNDER_REVIEW);
         }
         claimRepository.save(claim);
+        auditService.recordEvent(
+                claimReference,
+                "INFORMATION_PROVIDED",
+                "SYSTEM",
+                ClaimStatus.INFORMATION_REQUIRED,
+                claim.getStatus(),
+                "Response provided for information request " + requestId);
 
         return toResponse(savedRequest);
     }

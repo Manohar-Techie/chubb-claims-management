@@ -1,6 +1,8 @@
 package com.claim.chubb.controller;
 
 import com.claim.chubb.dto.ClaimInformationRequestResponse;
+import com.claim.chubb.dto.DashboardSummaryResponse;
+import com.claim.chubb.dto.AuditLogResponse;
 import com.claim.chubb.dto.ClaimDecisionResponse;
 import com.claim.chubb.dto.ClaimResponse;
 import com.claim.chubb.dto.CreateSettlementRequest;
@@ -16,8 +18,10 @@ import com.claim.chubb.dto.CreateAssessmentRequest;
 import com.claim.chubb.enums.ClaimStatus;
 import com.claim.chubb.service.AssignmentService;
 import com.claim.chubb.service.AssessmentService;
+import com.claim.chubb.service.AuditService;
 import com.claim.chubb.service.ClaimService;
 import com.claim.chubb.service.ClaimDecisionService;
+import com.claim.chubb.service.DashboardService;
 import com.claim.chubb.service.InformationService;
 import com.claim.chubb.service.SettlementService;
 import jakarta.validation.Valid;
@@ -40,6 +44,8 @@ public class ClaimController {
     private final AssessmentService assessmentService;
     private final ClaimDecisionService claimDecisionService;
     private final SettlementService settlementService;
+    private final AuditService auditService;
+    private final DashboardService dashboardService;
 
     public ClaimController(
             ClaimService claimService,
@@ -47,13 +53,17 @@ public class ClaimController {
             InformationService informationService,
             AssessmentService assessmentService,
             ClaimDecisionService claimDecisionService,
-            SettlementService settlementService) {
+            SettlementService settlementService,
+            AuditService auditService,
+            DashboardService dashboardService) {
         this.claimService = claimService;
         this.assignmentService = assignmentService;
         this.informationService = informationService;
         this.assessmentService = assessmentService;
         this.claimDecisionService = claimDecisionService;
         this.settlementService = settlementService;
+        this.auditService = auditService;
+        this.dashboardService = dashboardService;
     }
 
     @PostMapping
@@ -193,5 +203,17 @@ public class ClaimController {
 
         return ResponseEntity.ok(
                 settlementService.getSettlements(claimReference));
+    }
+
+    @GetMapping("/{claimReference}/audit-logs")
+    public ResponseEntity<List<AuditLogResponse>> getAuditHistory(
+            @PathVariable String claimReference) {
+
+        return ResponseEntity.ok(auditService.getAuditHistory(claimReference));
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardSummaryResponse> getDashboardSummary() {
+        return ResponseEntity.ok(dashboardService.getSummary());
     }
 }

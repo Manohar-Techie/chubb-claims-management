@@ -44,6 +44,9 @@ class SettlementServiceTest {
     @Mock
     private ClaimSettlementRepository settlementRepository;
 
+    @Mock
+    private AuditService auditService;
+
     @InjectMocks
     private SettlementService settlementService;
 
@@ -91,6 +94,9 @@ class SettlementServiceTest {
         assertEquals(ClaimStatus.SETTLED, claim.getStatus());
         verify(settlementRepository).saveAndFlush(any(ClaimSettlement.class));
         verify(claimRepository).save(claim);
+        verify(auditService).recordEvent(
+                eq(claimReference), eq("CLAIM_SETTLED"), eq("officer-1"),
+                eq(ClaimStatus.APPROVED), eq(ClaimStatus.SETTLED), contains("PAY-001"));
     }
 
     @Test
@@ -232,6 +238,33 @@ class SettlementServiceTest {
 
         assertEquals(ClaimStatus.APPROVED, claim.getStatus());
         verify(claimRepository, never()).save(any(Claim.class));
+        verifyNoInteractions(auditService);
+    }
+
+    @Test
+    void auditFailurePropagatesSoSettlementTransactionCanRollBack() {
+        stubApprovedClaim();
+        when(settlementRepository.existsByClaimClaimReference(claimReference))
+                .thenReturn(false);
+        when(settlementRepository.existsByPaymentReference("PAY-001"))
+                .thenReturn(false);
+        when(settlementRepository.saveAndFlush(any(ClaimSettlement.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        doThrow(new IllegalStateException("Audit write failed"))
+                .when(auditService).recordEvent(
+                        anyString(), anyString(), anyString(), any(), any(), anyString());
+
+        assertThrows(IllegalStateException.class, () ->
+                settlementService.settleClaim(claimReference, validRequest()));
+
+        verify(settlementRepository).saveAndFlush(any(ClaimSettlement.class));
+        verify(claimRepository).save(claim);
+        assertEquals(ClaimStatus.SETTLED, claim.getStatus());
+        var transactionAttribute = new AnnotationTransactionAttributeSource()
+                .getTransactionAttribute(
+                        getSettleClaimMethod(), SettlementService.class);
+        assertNotNull(transactionAttribute);
+        assertTrue(transactionAttribute.rollbackOn(new IllegalStateException()));
     }
 
     @Test

@@ -20,11 +20,14 @@ public class ClaimDecisionService {
 
     private final ClaimRepository claimRepository;
     private final ClaimDecisionRepository decisionRepository;
+    private final AuditService auditService;
 
     public ClaimDecisionService(ClaimRepository claimRepository,
-                                ClaimDecisionRepository decisionRepository) {
+                                ClaimDecisionRepository decisionRepository,
+                                AuditService auditService) {
         this.claimRepository = claimRepository;
         this.decisionRepository = decisionRepository;
+        this.auditService = auditService;
     }
 
     @Transactional
@@ -48,6 +51,16 @@ public class ClaimDecisionService {
                 ? ClaimStatus.APPROVED
                 : ClaimStatus.REJECTED);
         claimRepository.save(claim);
+        auditService.recordEvent(
+                claimReference,
+                request.decision() == DecisionValue.APPROVE
+                        ? "CLAIM_APPROVED"
+                        : "CLAIM_REJECTED",
+                request.decisionMakerIdentifier().trim(),
+                ClaimStatus.ASSESSED,
+                claim.getStatus(),
+                "Decision record " + savedDecision.getId()
+                        + ": " + savedDecision.getDecisionReason());
 
         return toResponse(savedDecision);
     }

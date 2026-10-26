@@ -19,11 +19,14 @@ public class AssessmentService {
 
     private final ClaimRepository claimRepository;
     private final ClaimAssessmentRepository assessmentRepository;
+    private final AuditService auditService;
 
     public AssessmentService(ClaimRepository claimRepository,
-                             ClaimAssessmentRepository assessmentRepository) {
+                             ClaimAssessmentRepository assessmentRepository,
+                             AuditService auditService) {
         this.claimRepository = claimRepository;
         this.assessmentRepository = assessmentRepository;
+        this.auditService = auditService;
     }
 
     @Transactional
@@ -47,6 +50,15 @@ public class AssessmentService {
         claim.setAssessedLiability(request.assessedLiability());
         claim.setStatus(ClaimStatus.ASSESSED);
         claimRepository.save(claim);
+        auditService.recordEvent(
+                claimReference,
+                "CLAIM_ASSESSED",
+                request.assessorOfficerIdentifier().trim(),
+                ClaimStatus.UNDER_REVIEW,
+                ClaimStatus.ASSESSED,
+                "Assessed liability: " + request.assessedLiability()
+                        + " " + request.currency()
+                        + "; assessmentId=" + savedAssessment.getId());
 
         return toResponse(savedAssessment);
     }

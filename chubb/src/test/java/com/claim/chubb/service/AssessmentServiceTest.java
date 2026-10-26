@@ -43,6 +43,9 @@ class AssessmentServiceTest {
     @Mock
     private ClaimAssessmentRepository assessmentRepository;
 
+    @Mock
+    private AuditService auditService;
+
     @InjectMocks
     private AssessmentService assessmentService;
 
@@ -86,6 +89,10 @@ class AssessmentServiceTest {
         assertEquals(ClaimStatus.ASSESSED, claim.getStatus());
         verify(assessmentRepository).save(any(ClaimAssessment.class));
         verify(claimRepository).save(claim);
+        verify(auditService).recordEvent(
+                eq(claimReference), eq("CLAIM_ASSESSED"), eq("officer-1"),
+                eq(ClaimStatus.UNDER_REVIEW), eq(ClaimStatus.ASSESSED),
+                contains("250.00"));
     }
 
     @Test

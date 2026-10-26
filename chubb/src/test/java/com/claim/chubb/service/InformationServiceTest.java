@@ -32,6 +32,9 @@ class InformationServiceTest {
     @Mock
     private ClaimInformationRequestRepository informationRequestRepository;
 
+    @Mock
+    private AuditService auditService;
+
     @InjectMocks
     private InformationService informationService;
 
@@ -67,6 +70,10 @@ class InformationServiceTest {
         assertEquals(ClaimStatus.INFORMATION_REQUIRED, claim.getStatus());
         verify(informationRequestRepository).save(any(ClaimInformationRequest.class));
         verify(claimRepository).save(claim);
+        verify(auditService).recordEvent(
+                eq(claimReference), eq("INFORMATION_REQUESTED"), eq("SYSTEM"),
+                eq(ClaimStatus.UNDER_REVIEW), eq(ClaimStatus.INFORMATION_REQUIRED),
+                contains("Provide repair records"));
     }
 
     @Test
@@ -89,6 +96,10 @@ class InformationServiceTest {
         assertNotNull(result.responseAt());
         assertEquals(ClaimStatus.UNDER_REVIEW, claim.getStatus());
         verify(claimRepository).save(claim);
+        verify(auditService).recordEvent(
+                eq(claimReference), eq("INFORMATION_PROVIDED"), eq("SYSTEM"),
+                eq(ClaimStatus.INFORMATION_REQUIRED), eq(ClaimStatus.UNDER_REVIEW),
+                contains("12"));
     }
 
     @Test
@@ -108,6 +119,10 @@ class InformationServiceTest {
                 claimReference, 12L, new ProvideInformationRequest("Records attached"));
 
         assertEquals(ClaimStatus.INFORMATION_REQUIRED, claim.getStatus());
+        verify(auditService).recordEvent(
+                eq(claimReference), eq("INFORMATION_PROVIDED"), eq("SYSTEM"),
+                eq(ClaimStatus.INFORMATION_REQUIRED), eq(ClaimStatus.INFORMATION_REQUIRED),
+                contains("12"));
     }
 
     @Test

@@ -20,11 +20,14 @@ public class SettlementService {
 
     private final ClaimRepository claimRepository;
     private final ClaimSettlementRepository settlementRepository;
+    private final AuditService auditService;
 
     public SettlementService(ClaimRepository claimRepository,
-                             ClaimSettlementRepository settlementRepository) {
+                             ClaimSettlementRepository settlementRepository,
+                             AuditService auditService) {
         this.claimRepository = claimRepository;
         this.settlementRepository = settlementRepository;
+        this.auditService = auditService;
     }
 
     @Transactional
@@ -71,6 +74,15 @@ public class SettlementService {
 
         claim.setStatus(ClaimStatus.SETTLED);
         claimRepository.save(claim);
+        auditService.recordEvent(
+                claimReference,
+                "CLAIM_SETTLED",
+                request.processedByOfficerIdentifier().trim(),
+                ClaimStatus.APPROVED,
+                ClaimStatus.SETTLED,
+                "Settlement " + savedSettlement.getId() + ": "
+                        + request.settlementAmount() + " " + request.currency()
+                        + "; paymentReference=" + paymentReference);
 
         return toResponse(savedSettlement);
     }

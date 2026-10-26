@@ -19,13 +19,16 @@ public class AssignmentService {
 
     private final ClaimRepository claimRepository;
     private final ClaimAssignmentRepository assignmentRepository;
+    private final AuditService auditService;
 
     public AssignmentService(
             ClaimRepository claimRepository,
-            ClaimAssignmentRepository assignmentRepository) {
+            ClaimAssignmentRepository assignmentRepository,
+            AuditService auditService) {
 
         this.claimRepository = claimRepository;
         this.assignmentRepository = assignmentRepository;
+        this.auditService = auditService;
     }
 
     @Transactional
@@ -66,6 +69,13 @@ public class AssignmentService {
                 request.officerIdentifier().trim());
 
         assignmentRepository.save(assignment);
+        auditService.recordEvent(
+                savedClaim.getClaimReference(),
+                "CLAIM_ASSIGNED",
+                request.officerIdentifier().trim(),
+                currentStatus,
+                savedClaim.getStatus(),
+                "Assigned officer: " + request.officerIdentifier().trim());
 
         return savedClaim;
     }
