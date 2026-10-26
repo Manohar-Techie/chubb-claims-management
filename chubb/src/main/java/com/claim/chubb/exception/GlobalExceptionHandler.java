@@ -68,4 +68,16 @@ public class GlobalExceptionHandler {
                         "message", "An unexpected error occurred"
                 ));
     }
+    @ExceptionHandler(InvalidClaimStateException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidClaimState(
+            InvalidClaimStateException ex) {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of(
+                        "timestamp", LocalDateTime.now().toString(),
+                        "status", 409,
+                        "error", "Conflict",
+                        "message", ex.getMessage()
+                ));
+    }
 }

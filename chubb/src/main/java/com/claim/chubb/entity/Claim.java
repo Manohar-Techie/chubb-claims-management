@@ -173,4 +173,12 @@ public class Claim {
     public void setCurrency(String value) {
         this.currency = value;
     }
+
+    public void setAssignedOfficerIdentifier(String officerIdentifier) {
+        this.assignedOfficerIdentifier = officerIdentifier;
+    }
+
+    public void setStatus(ClaimStatus status) {
+        this.status = status;
+    }
 }
