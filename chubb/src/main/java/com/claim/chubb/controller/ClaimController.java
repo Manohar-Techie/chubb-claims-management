@@ -35,7 +35,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/api/v1/claims")
+@RequestMapping("/api/claims")
 public class ClaimController {
 
     private final ClaimService claimService;

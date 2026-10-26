@@ -16,7 +16,7 @@ Record settlements for approved claims.
 Maintain audit history of important claim operations.
 Provide dashboard summaries of claims, officer workloads, and outstanding liability.
 Validate API requests and handle exceptions consistently.
-Use API versioning through the /api/v1 base path.
+Use `/api/claims` as the claims API base path.
 ## Technology Stack
    Technology	Purpose
    Java 21	Programming language
@@ -173,41 +173,41 @@ Confirm successful startup in the console before testing endpoints.
 
 All endpoints use the base path:
 
-http://localhost:8002/api/v1/claims
+http://localhost:8002/api/claims
 
 ## Claim Management
 Method	Endpoint	Description
-POST	/api/v1/claims	Submit a claim
-GET	/api/v1/claims	Retrieve all claims
-GET	/api/v1/claims?status=UNDER_REVIEW	Filter claims by status
-GET	/api/v1/claims/{claimReference}	Retrieve a claim by reference
+POST	/api/claims	Submit a claim
+GET	/api/claims	Retrieve all claims
+GET	/api/claims?status=UNDER_REVIEW	Filter claims by status
+GET	/api/claims/{claimReference}	Retrieve a claim by reference
 7.2 Claim Assignment
 Method	Endpoint	Description
-PUT	/api/v1/claims/{claimReference}/assignment	Assign a claim to an officer
-GET	/api/v1/claims/{claimReference}/assignments	Retrieve assignment history
+PUT	/api/claims/{claimReference}/assignment	Assign a claim to an officer
+GET	/api/claims/{claimReference}/assignments	Retrieve assignment history
 7.3 Additional Information
 Method	Endpoint	Description
-POST	/api/v1/claims/{claimReference}/information-requests	Request additional information
-GET	/api/v1/claims/{claimReference}/information-requests	Retrieve information requests
-POST	/api/v1/claims/{claimReference}/information-requests/{requestId}/response	Record a response to an information request
+POST	/api/claims/{claimReference}/information-requests	Request additional information
+GET	/api/claims/{claimReference}/information-requests	Retrieve information requests
+POST	/api/claims/{claimReference}/information-requests/{requestId}/response	Record a response to an information request
 7.4 Claim Assessment
 Method	Endpoint	Description
-POST	/api/v1/claims/{claimReference}/assessments	Create a claim assessment
-GET	/api/v1/claims/{claimReference}/assessments	Retrieve assessment history
+POST	/api/claims/{claimReference}/assessments	Create a claim assessment
+GET	/api/claims/{claimReference}/assessments	Retrieve assessment history
 7.5 Claim Decision
 Method	Endpoint	Description
-POST	/api/v1/claims/{claimReference}/decision	Approve or reject a claim
-GET	/api/v1/claims/{claimReference}/decisions	Retrieve decision history
+POST	/api/claims/{claimReference}/decision	Approve or reject a claim
+GET	/api/claims/{claimReference}/decisions	Retrieve decision history
 7.6 Settlement
 Method	Endpoint	Description
-POST	/api/v1/claims/{claimReference}/settlements	Record a claim settlement
-GET	/api/v1/claims/{claimReference}/settlements	Retrieve settlement details
+POST	/api/claims/{claimReference}/settlements	Record a claim settlement
+GET	/api/claims/{claimReference}/settlements	Retrieve settlement details
 7.7 Audit History
 Method	Endpoint	Description
-GET	/api/v1/claims/{claimReference}/audit-logs	Retrieve audit history for a claim
+GET	/api/claims/{claimReference}/audit-logs	Retrieve audit history for a claim
 7.8 Dashboard
 Method	Endpoint	Description
-GET	/api/v1/claims/dashboard	Retrieve claim dashboard summary
+GET	/api/claims/dashboard	Retrieve claim dashboard summary
 
 The dashboard is intended to report total claims, counts by status, officer workload, and outstanding assessed liability grouped by currency.
 
@@ -260,7 +260,7 @@ The application should enforce these rules in the service layer.
 The examples below illustrate the intended API contracts. Confirm field names against the actual request DTOs in the project.
 
 Create an Assessment
-POST /api/v1/claims/{claimReference}/assessments
+POST /api/claims/{claimReference}/assessments
 Content-Type: application/json
 {
 "assessedLiability": 45000.00,
@@ -269,7 +269,7 @@ Content-Type: application/json
 "assessorOfficerIdentifier": "OFFICER002"
 }
 Approve a Claim
-POST /api/v1/claims/{claimReference}/decision
+POST /api/claims/{claimReference}/decision
 Content-Type: application/json
 {
 "decision": "APPROVE",
@@ -277,7 +277,7 @@ Content-Type: application/json
 "decisionReason": "Assessment reviewed and claim approved."
 }
 Record a Settlement
-POST /api/v1/claims/{claimReference}/settlements
+POST /api/claims/{claimReference}/settlements
 Content-Type: application/json
 {
 "settlementAmount": 45000.00,
