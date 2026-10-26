@@ -1,7 +1,9 @@
 package com.claim.chubb.controller;
 
 import com.claim.chubb.dto.ClaimInformationRequestResponse;
+import com.claim.chubb.dto.ClaimDecisionResponse;
 import com.claim.chubb.dto.ClaimResponse;
+import com.claim.chubb.dto.CreateClaimDecisionRequest;
 import com.claim.chubb.dto.CreateClaimRequest;
 import com.claim.chubb.dto.ProvideInformationRequest;
 import com.claim.chubb.dto.RequestInformationRequest;
@@ -13,6 +15,7 @@ import com.claim.chubb.enums.ClaimStatus;
 import com.claim.chubb.service.AssignmentService;
 import com.claim.chubb.service.AssessmentService;
 import com.claim.chubb.service.ClaimService;
+import com.claim.chubb.service.ClaimDecisionService;
 import com.claim.chubb.service.InformationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -32,16 +35,19 @@ public class ClaimController {
     private final AssignmentService assignmentService;
     private final InformationService informationService;
     private final AssessmentService assessmentService;
+    private final ClaimDecisionService claimDecisionService;
 
     public ClaimController(
             ClaimService claimService,
             AssignmentService assignmentService,
             InformationService informationService,
-            AssessmentService assessmentService) {
+            AssessmentService assessmentService,
+            ClaimDecisionService claimDecisionService) {
         this.claimService = claimService;
         this.assignmentService = assignmentService;
         this.informationService = informationService;
         this.assessmentService = assessmentService;
+        this.claimDecisionService = claimDecisionService;
     }
 
     @PostMapping
@@ -147,5 +153,22 @@ public class ClaimController {
 
         return ResponseEntity.ok(
                 assessmentService.getAssessmentHistory(claimReference));
+    }
+
+    @PostMapping("/{claimReference}/decision")
+    public ResponseEntity<ClaimDecisionResponse> decideClaim(
+            @PathVariable String claimReference,
+            @Valid @RequestBody CreateClaimDecisionRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(claimDecisionService.makeDecision(claimReference, request));
+    }
+
+    @GetMapping("/{claimReference}/decisions")
+    public ResponseEntity<List<ClaimDecisionResponse>> getDecisionHistory(
+            @PathVariable String claimReference) {
+
+        return ResponseEntity.ok(
+                claimDecisionService.getDecisionHistory(claimReference));
     }
 }
