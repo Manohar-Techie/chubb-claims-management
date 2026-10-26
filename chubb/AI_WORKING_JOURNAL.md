@@ -45,19 +45,19 @@ Design the claims database schema, entities, repositories, and status lifecycle.
 
 ### AI assistance
 
-Pending.
+Used GitHub Copilot to implement the initial claims persistence model after reviewing the existing Maven project configuration.
 
 ### Decisions accepted or challenged
 
-Pending.
+Retained existing Spring Data JPA, validation, and MySQL dependencies; no dependency changes were needed. Per the project direction, Flyway was excluded from this milestone. Database credentials use environment-variable placeholders. Market codes remain unrestricted strings because the assessment does not enumerate them.
 
 ### Reasoning
 
-Pending.
+JPA schema update is enabled for this development milestone in place of Flyway. Monetary fields use BigDecimal-compatible DECIMAL precision, status and type are persisted as strings, common operational lookup paths are indexed, and a version field enables optimistic locking. No authentication or officer directory was added.
 
 ### Verification
 
-Pending.
+Maven compile completed successfully with `.\chubb\mvnw.cmd -f .\chubb\pom.xml -DskipTests compile`. Database connection has not been tested.
 
 ## Session 3: Claims Workflow
 
