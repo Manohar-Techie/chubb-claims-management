@@ -115,7 +115,7 @@ For the initial implementation, outstanding liability exposure is defined as the
 
 ## 7. Engineering Requirements
 
-* REST endpoints under /api/v1.
+* REST endpoints under /api.
 * Use DTOs for requests and responses.
 * Keep controllers thin.
 * Put business rules in services.
