@@ -6,99 +6,37 @@ Chubb APAC Claims Management Backend
 
 ## Technology
 
-* Java 21
-* Spring Boot
-* Maven
-* MySQL
-* Spring Data JPA
-* Git and GitHub
-* IntelliJ IDEA
-* GitHub Copilot
+Java 21, Spring Boot, Maven, MySQL, Spring Data JPA, Git, IntelliJ IDEA, GitHub Copilot, and Postman.
 
-## Session 1: Project Initialization
+## Session 1: Project Setup
 
-### Objective
+**AI Assistance:** Used ChatGPT to plan the project structure, implementation sequence, and API versioning.
 
-Create the initial Spring Boot project using Spring Initializr.
+**Decision:** Selected a layered modular monolith to meet the 2–3 hour assessment target.
 
-### AI assistance
-
-Used ChatGPT to plan the project structure, implementation sequence, and Git workflow.
-
-### Decision
-
-Selected a layered modular monolith.
-
-### Reasoning
-
-The assessment has a 2–3 hour target. A modular monolith allows the core claims workflow to be implemented without the operational complexity of multiple independently deployed services.
-
-### Verification
-
-Pending.
+**Verification:** Maven compilation completed successfully.
 
 ## Session 2: Database and Domain Model
 
-### Objective
+**AI Assistance:** Used GitHub Copilot to implement entities, repositories, and persistence logic.
 
-Design the claims database schema, entities, repositories, and status lifecycle.
+**Decision:** Used Spring Data JPA, MySQL, string-based claim statuses, and environment-based database configuration.
 
-### AI assistance
-
-Used GitHub Copilot to implement the initial claims persistence model after reviewing the existing Maven project configuration.
-
-### Decisions accepted or challenged
-
-Retained existing Spring Data JPA, validation, and MySQL dependencies; no dependency changes were needed. Per the project direction, Flyway was excluded from this milestone. Database credentials use environment-variable placeholders. Market codes remain unrestricted strings because the assessment does not enumerate them.
-
-### Reasoning
-
-JPA schema update is enabled for this development milestone in place of Flyway. Monetary fields use BigDecimal-compatible DECIMAL precision, status and type are persisted as strings, common operational lookup paths are indexed, and a version field enables optimistic locking. No authentication or officer directory was added.
-
-### Verification
-
-Maven compile completed successfully with `.\chubb\mvnw.cmd -f .\chubb\pom.xml -DskipTests compile`. Database connection has not been tested.
+**Verification:** Investigated database connectivity and claim-status persistence issues.
 
 ## Session 3: Claims Workflow
 
-### Objective
+**AI Assistance:** Used ChatGPT and GitHub Copilot for implementation guidance and troubleshooting.
 
-Implement claim submission, assignment, information requests, assessments, decisions, and settlement.
+**Decision:** Implemented claim submission, assignment, information requests, assessments, decisions, settlements, and audit history.
 
-### AI assistance
+**Verification:** Tested API requests using Postman.
 
-Pending.
+## Session 4: Dashboard and Documentation
 
-### Decisions accepted or challenged
+**AI Assistance:** Used ChatGPT to identify remaining requirements and prepare the README and AI journal.
 
-Pending.
+**Decision:** Used versioned REST APIs and documented Kafka as a future integration.
 
-### Reasoning
+**Verification:** Final dashboard, exception handling, and automated test results require confirmation before submission.
 
-Pending.
-
-### Verification
-
-Pending.
-
-## Session 4: Dashboard and Testing
-
-### Objective
-
-Implement management reporting, liability exposure, validation, exception handling, and automated tests.
-
-### AI assistance
-
-Pending.
-
-### Decisions accepted or challenged
-
-Pending.
-
-### Reasoning
-
-Pending.
-
-### Verification
-
-Pending.
