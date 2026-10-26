@@ -40,6 +40,7 @@ public class Claim {
     @Column(nullable = false, length = 3)
     private String currency;
 
+    @Column(precision = 15, scale = 2)
     private BigDecimal assessedLiability;
 
     @Enumerated(EnumType.STRING)
@@ -180,5 +181,9 @@ public class Claim {
 
     public void setStatus(ClaimStatus status) {
         this.status = status;
+    }
+
+    public void setAssessedLiability(BigDecimal assessedLiability) {
+        this.assessedLiability = assessedLiability;
     }
 }

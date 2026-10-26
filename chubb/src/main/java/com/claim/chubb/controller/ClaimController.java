@@ -1,19 +1,23 @@
 package com.claim.chubb.controller;
 
+import com.claim.chubb.dto.ClaimInformationRequestResponse;
 import com.claim.chubb.dto.ClaimResponse;
 import com.claim.chubb.dto.CreateClaimRequest;
+import com.claim.chubb.dto.ProvideInformationRequest;
+import com.claim.chubb.dto.RequestInformationRequest;
+import com.claim.chubb.dto.AssignClaimRequest;
+import com.claim.chubb.dto.AssessmentResponse;
+import com.claim.chubb.entity.Claim;
+import com.claim.chubb.dto.CreateAssessmentRequest;
 import com.claim.chubb.enums.ClaimStatus;
+import com.claim.chubb.service.AssignmentService;
+import com.claim.chubb.service.AssessmentService;
 import com.claim.chubb.service.ClaimService;
+import com.claim.chubb.service.InformationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import com.claim.chubb.dto.AssignClaimRequest;
-import com.claim.chubb.entity.Claim;
-import com.claim.chubb.entity.ClaimAssignment;
-import com.claim.chubb.service.AssignmentService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -26,10 +30,18 @@ public class ClaimController {
 
     private final ClaimService claimService;
     private final AssignmentService assignmentService;
+    private final InformationService informationService;
+    private final AssessmentService assessmentService;
 
-    public ClaimController(ClaimService claimService, AssignmentService assignmentService) {
+    public ClaimController(
+            ClaimService claimService,
+            AssignmentService assignmentService,
+            InformationService informationService,
+            AssessmentService assessmentService) {
         this.claimService = claimService;
         this.assignmentService = assignmentService;
+        this.informationService = informationService;
+        this.assessmentService = assessmentService;
     }
 
     @PostMapping
@@ -57,6 +69,7 @@ public class ClaimController {
 
         return claimService.getAllClaims();
     }
+
     @PutMapping("/{claimReference}/assignment")
     public ResponseEntity<Map<String, Object>> assignClaim(
             @PathVariable String claimReference,
@@ -89,5 +102,50 @@ public class ClaimController {
                         .toList();
 
         return ResponseEntity.ok(history);
+    }
+
+    @PostMapping("/{claimReference}/information-requests")
+    public ResponseEntity<ClaimInformationRequestResponse> requestInformation(
+            @PathVariable String claimReference,
+            @Valid @RequestBody RequestInformationRequest request) {
+
+        ClaimInformationRequestResponse response =
+                informationService.requestInformation(claimReference, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/{claimReference}/information-requests")
+    public ResponseEntity<List<ClaimInformationRequestResponse>> getInformationRequests(
+            @PathVariable String claimReference) {
+
+        return ResponseEntity.ok(
+                informationService.getInformationRequests(claimReference));
+    }
+
+    @PostMapping("/{claimReference}/information-requests/{requestId}/response")
+    public ResponseEntity<ClaimInformationRequestResponse> provideInformation(
+            @PathVariable String claimReference,
+            @PathVariable Long requestId,
+            @Valid @RequestBody ProvideInformationRequest request) {
+
+        return ResponseEntity.ok(
+                informationService.provideInformation(claimReference, requestId, request));
+    }
+
+    @PostMapping("/{claimReference}/assessments")
+    public ResponseEntity<AssessmentResponse> assessClaim(
+            @PathVariable String claimReference,
+            @Valid @RequestBody CreateAssessmentRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(assessmentService.assessClaim(claimReference, request));
+    }
+
+    @GetMapping("/{claimReference}/assessments")
+    public ResponseEntity<List<AssessmentResponse>> getAssessmentHistory(
+            @PathVariable String claimReference) {
+
+        return ResponseEntity.ok(
+                assessmentService.getAssessmentHistory(claimReference));
     }
 }
